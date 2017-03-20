@@ -3,10 +3,10 @@ import { Logger } from './logger/logger';
 import { fillConfigDefaults, getUserConfigFile, replacePathVars } from './util/config';
 import * as Constants from './util/constants';
 import { BuildError } from './util/errors';
-import { getBooleanPropertyValue, webpackStatsToDependencyMap, printDependencyMap, unlinkAsync } from './util/helpers';
+import { getBooleanPropertyValue, getStringPropertyValue, webpackStatsToDependencyMap, printDependencyMap, unlinkAsync } from './util/helpers';
 import { BuildContext, TaskInfo } from './util/interfaces';
 import { runWebpackFullBuild, WebpackConfig } from './webpack';
-import { purgeDecorators } from './optimization/decorators';
+import { purgeDecorators, removeTSickleClosureDeclarations } from './optimization/decorators';
 import { getAppModuleNgFactoryPath, calculateUnusedComponents, purgeUnusedImportsAndExportsFromIndex, purgeComponentNgFactoryImportAndUsage, purgeProviderControllerImportAndUsage, purgeProviderClassNameFromIonicModuleForRoot } from './optimization/treeshake';
 
 export function optimization(context: BuildContext, configFile: string) {
@@ -77,6 +77,7 @@ function removeDecorators(context: BuildContext) {
   const jsFiles = context.fileCache.getAll().filter(file => extname(file.path) === '.js');
   jsFiles.forEach(jsFile => {
     jsFile.content = purgeDecorators(jsFile.path, jsFile.content);
+    jsFile.content = removeTSickleClosureDeclarations(jsFile.path, jsFile.content, getStringPropertyValue(Constants.ENV_VAR_IONIC_ANGULAR_DIR), context.srcDir);
   });
 }
 

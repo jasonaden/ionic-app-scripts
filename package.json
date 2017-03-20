@@ -90,6 +90,7 @@
     "github": "0.2.4",
     "ionic-cz-conventional-changelog": "1.0.0",
     "jest": "^18.0.0",
+    "magic-string": "^0.19.0",
     "mock-fs": "3.11.0",
     "rewire": "^2.5.2",
     "rimraf": "2.5.4",
