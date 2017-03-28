@@ -1,4 +1,4 @@
-import { readdirSync } from 'fs';
+import { readdirSync, readFileSync, writeFileSync } from 'fs';
 import { extname, join } from 'path';
 
 import * as uglify from 'uglify-js';
@@ -44,6 +44,11 @@ export function uglifyjsWorkerImpl(context: BuildContext, uglifyJsConfig: Uglify
         uglifyJsConfig.inSourceMap = join(context.buildDir, file + '.map');
         uglifyJsConfig.destFileName = join(context.buildDir, file);
         uglifyJsConfig.outSourceMap = join(context.buildDir, file + '.map');
+
+        let sourceFile = readFileSync(uglifyJsConfig.sourceFile, 'utf8');
+        sourceFile = sourceFile.replace(new RegExp(/(var \b.+\b = )(\(function \((?:_super)?\) {\n)/, 'g'), '$1/*@__PURE__*/$2');
+        writeFileSync(uglifyJsConfig.sourceFile, sourceFile);
+        writeFileSync(uglifyJsConfig.sourceFile + 'premin.js', sourceFile);
 
         const minifyOutput: uglify.MinifyOutput = runUglifyInternal(uglifyJsConfig);
 
